@@ -5,29 +5,61 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Formulir Pengukuran Seragam Sekolah</title>
     <style>
-        body {
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
             font-family: Arial, sans-serif;
+        }
+        body {
+            background-color: #f0f7f4;
+            color: #2d6a4f;
             padding: 20px;
+            line-height: 1.6;
+        }
+        h2, h3 {
+            color: #40916c;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
         }
         .form-container, .admin-container {
-            max-width: 800px;
-            margin: 0 auto;
+            background: #ffffff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
         }
         .hidden {
             display: none;
         }
-        .result {
-            margin-top: 20px;
+        label {
+            display: block;
+            margin: 10px 0 5px;
+            font-weight: bold;
         }
-        .admin-popup {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: white;
-            padding: 20px;
-            border: 1px solid #ccc;
-            box-shadow: 0 0 10px rgba(0,0,0,0.3);
+        input, select, button {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #74c69d;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        button {
+            background-color: #40916c;
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #2d6a4f;
+        }
+        .result {
+            margin-top: 10px;
+            font-size: 18px;
         }
         table {
             width: 100%;
@@ -35,70 +67,95 @@
             margin-top: 20px;
         }
         th, td {
-            border: 1px solid #ddd;
-            padding: 8px;
+            border: 1px solid #74c69d;
+            padding: 10px;
             text-align: left;
         }
         th {
-            background-color: #f2f2f2;
+            background-color: #95d5b2;
+            color: #2d6a4f;
+        }
+        .nav-button {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: auto;
+            padding: 10px 20px;
+        }
+        @media (max-width: 600px) {
+            .container {
+                padding: 10px;
+            }
+            input, select, button {
+                font-size: 14px;
+            }
+            .form-container, .admin-container {
+                padding: 15px;
+            }
+            th, td {
+                font-size: 14px;
+                padding: 8px;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="form-container">
-        <h2>Formulir Pengukuran Seragam Sekolah</h2>
-        <label for="studentId">Masukkan ID Siswa:</label>
-        <input type="text" id="studentId" placeholder="Contoh: A001">
-        <button onclick="checkStudent()">Cek</button>
-        <div id="studentName" class="result"></div>
+    <div class="container">
+        <div id="formPage" class="form-container">
+            <h2>Formulir Pengukuran Seragam Sekolah</h2>
+            <label for="studentId">Masukkan ID Siswa:</label>
+            <input type="text" id="studentId" placeholder="Contoh: A001">
+            <button onclick="checkStudent()">Cek</button>
+            <div id="studentName" class="result"></div>
 
-        <div id="uniformForm" class="hidden">
-            <h3>Pilih Ukuran Seragam</h3>
-            <label>Baju Putih:</label>
-            <select id="bajuPutih">
-                <option value="">Pilih Ukuran</option>
-                <option value="S">S</option>
-                <option value="M">M</option>
-                <option value="L">L</option>
-                <option value="XL">XL</option>
-            </select><br><br>
+            <div id="uniformForm" class="hidden">
+                <h3>Pilih Ukuran Seragam</h3>
+                <label>Baju Putih:</label>
+                <select id="bajuPutih">
+                    <option value="">Pilih Ukuran</option>
+                    <option value="S">S</option>
+                    <option value="M">M</option>
+                    <option value="L">L</option>
+                    <option value="XL">XL</option>
+                </select>
 
-            <label>Celana Biru:</label>
-            <select id="celanaBiru">
-                <option value="">Pilih Ukuran</option>
-                <option value="S">S</option>
-                <option value="M">M</option>
-                <option value="L">L</option>
-                <option value="XL">XL</option>
-            </select><br><br>
+                <label>Celana Biru:</label>
+                <select id="celanaBiru">
+                    <option value="">Pilih Ukuran</option>
+                    <option value="S">S</option>
+                    <option value="M">M</option>
+                    <option value="L">L</option>
+                    <option value="XL">XL</option>
+                </select>
 
-            <button onclick="saveData()">Simpan</button>
+                <button onclick="saveData()">Simpan</button>
+            </div>
+        </div>
+
+        <div id="adminPage" class="admin-container hidden">
+            <h2>Halaman Admin</h2>
+            <label for="adminPassword">Masukkan Password:</label>
+            <input type="password" id="adminPassword">
+            <button onclick="checkAdmin()">Login</button>
+            <div id="adminData" class="hidden">
+                <h3>Data Seragam</h3>
+                <table id="dataTable">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nama</th>
+                            <th>Baju Putih</th>
+                            <th>Celana Biru</th>
+                        </tr>
+                    </thead>
+                    <tbody id="dataBody"></tbody>
+                </table>
+                <button onclick="downloadCSV()" style="margin-top: 20px;">Download CSV</button>
+            </div>
         </div>
     </div>
 
-    <div id="adminPopup" class="admin-container hidden">
-        <h3>Login Admin</h3>
-        <label for="adminPassword">Password:</label>
-        <input type="password" id="adminPassword">
-        <button onclick="checkAdmin()">Login</button>
-    </div>
-
-    <button onclick="showAdminPopup()" style="position: fixed; bottom: 20px; right: 20px;">Admin</button>
-    <div id="adminData" class="admin-container hidden">
-        <h3>Data Seragam</h3>
-        <table id="dataTable">
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Nama</th>
-                    <th>Baju Putih</th>
-                    <th>Celana Biru</th>
-                </tr>
-            </thead>
-            <tbody id="dataBody"></tbody>
-        </table>
-        <button onclick="downloadCSV()" style="margin-top: 20px;">Download CSV</button>
-    </div>
+    <button onclick="toggleAdminPage()" class="nav-button">Admin</button>
 
     <script>
         // Data siswa
@@ -144,15 +201,18 @@
             }
         }
 
-        function showAdminPopup() {
-            document.getElementById("adminPopup").classList.remove("hidden");
+        function toggleAdminPage() {
+            const formPage = document.getElementById("formPage");
+            const adminPage = document.getElementById("adminPage");
+            formPage.classList.toggle("hidden");
+            adminPage.classList.toggle("hidden");
         }
 
         function checkAdmin() {
             const password = document.getElementById("adminPassword").value;
+            const adminData = document.getElementById("adminData");
             if (password === adminPassword) {
-                document.getElementById("adminPopup").classList.add("hidden");
-                document.getElementById("adminData").classList.remove("hidden");
+                adminData.classList.remove("hidden");
                 displayTable();
             } else {
                 alert("Password salah!");
@@ -161,7 +221,7 @@
 
         function displayTable() {
             const tbody = document.getElementById("dataBody");
-            tbody.innerHTML = ""; // Kosongkan tabel sebelum isi ulang
+            tbody.innerHTML = "";
             for (const id in uniformData) {
                 const row = document.createElement("tr");
                 row.innerHTML = `
