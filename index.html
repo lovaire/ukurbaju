@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Formulir Pengukuran Seragam Sekolah</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+        .form-container, .admin-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .hidden {
+            display: none;
+        }
+        .result {
+            margin-top: 20px;
+        }
+        .admin-popup {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 20px;
+            border: 1px solid #ccc;
+            box-shadow: 0 0 10px rgba(0,0,0,0.3);
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+    <div class="form-container">
+        <h2>Formulir Pengukuran Seragam Sekolah</h2>
+        <label for="studentId">Masukkan ID Siswa:</label>
+        <input type="text" id="studentId" placeholder="Contoh: A001">
+        <button onclick="checkStudent()">Cek</button>
+        <div id="studentName" class="result"></div>
+
+        <div id="uniformForm" class="hidden">
+            <h3>Pilih Ukuran Seragam</h3>
+            <label>Baju Putih:</label>
+            <select id="bajuPutih">
+                <option value="">Pilih Ukuran</option>
+                <option value="S">S</option>
+                <option value="M">M</option>
+                <option value="L">L</option>
+                <option value="XL">XL</option>
+            </select><br><br>
+
+            <label>Celana Biru:</label>
+            <select id="celanaBiru">
+                <option value="">Pilih Ukuran</option>
+                <option value="S">S</option>
+                <option value="M">M</option>
+                <option value="L">L</option>
+                <option value="XL">XL</option>
+            </select><br><br>
+
+            <button onclick="saveData()">Simpan</button>
+        </div>
+    </div>
+
+    <div id="adminPopup" class="admin-container hidden">
+        <h3>Login Admin</h3>
+        <label for="adminPassword">Password:</label>
+        <input type="password" id="adminPassword">
+        <button onclick="checkAdmin()">Login</button>
+    </div>
+
+    <button onclick="showAdminPopup()" style="position: fixed; bottom: 20px; right: 20px;">Admin</button>
+    <div id="adminData" class="admin-container hidden">
+        <h3>Data Seragam</h3>
+        <table id="dataTable">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nama</th>
+                    <th>Baju Putih</th>
+                    <th>Celana Biru</th>
+                </tr>
+            </thead>
+            <tbody id="dataBody"></tbody>
+        </table>
+        <button onclick="downloadCSV()" style="margin-top: 20px;">Download CSV</button>
+    </div>
+
+    <script>
+        // Data siswa
+        const students = {
+            "A001": "Ali",
+            "B002": "Ahmad"
+        };
+
+        // Data seragam yang disimpan
+        let uniformData = {};
+
+        // Password admin
+        const adminPassword = "admin123";
+
+        function checkStudent() {
+            const id = document.getElementById("studentId").value.toUpperCase();
+            const nameDisplay = document.getElementById("studentName");
+            const uniformForm = document.getElementById("uniformForm");
+
+            if (students[id]) {
+                nameDisplay.textContent = `Nama: ${students[id]}`;
+                uniformForm.classList.remove("hidden");
+            } else {
+                nameDisplay.textContent = "ID tidak ditemukan!";
+                uniformForm.classList.add("hidden");
+            }
+        }
+
+        function saveData() {
+            const id = document.getElementById("studentId").value.toUpperCase();
+            const bajuPutih = document.getElementById("bajuPutih").value;
+            const celanaBiru = document.getElementById("celanaBiru").value;
+
+            if (bajuPutih && celanaBiru) {
+                uniformData[id] = {
+                    name: students[id],
+                    bajuPutih: bajuPutih,
+                    celanaBiru: celanaBiru
+                };
+                alert("Data berhasil disimpan!");
+            } else {
+                alert("Silakan pilih semua ukuran!");
+            }
+        }
+
+        function showAdminPopup() {
+            document.getElementById("adminPopup").classList.remove("hidden");
+        }
+
+        function checkAdmin() {
+            const password = document.getElementById("adminPassword").value;
+            if (password === adminPassword) {
+                document.getElementById("adminPopup").classList.add("hidden");
+                document.getElementById("adminData").classList.remove("hidden");
+                displayTable();
+            } else {
+                alert("Password salah!");
+            }
+        }
+
+        function displayTable() {
+            const tbody = document.getElementById("dataBody");
+            tbody.innerHTML = ""; // Kosongkan tabel sebelum isi ulang
+            for (const id in uniformData) {
+                const row = document.createElement("tr");
+                row.innerHTML = `
+                    <td>${id}</td>
+                    <td>${uniformData[id].name}</td>
+                    <td>${uniformData[id].bajuPutih}</td>
+                    <td>${uniformData[id].celanaBiru}</td>
+                `;
+                tbody.appendChild(row);
+            }
+        }
+
+        function downloadCSV() {
+            let csvContent = "ID,Nama,Baju Putih,Celana Biru\n";
+            for (const id in uniformData) {
+                const row = [
+                    id,
+                    uniformData[id].name,
+                    uniformData[id].bajuPutih,
+                    uniformData[id].celanaBiru
+                ].join(",");
+                csvContent += row + "\n";
+            }
+
+            const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+            const link = document.createElement("a");
+            const url = URL.createObjectURL(blob);
+            link.setAttribute("href", url);
+            link.setAttribute("download", "data_seragam.csv");
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+    </script>
+</body>
+</html>
