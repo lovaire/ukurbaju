@@ -171,11 +171,18 @@
             messagingSenderId: "502089598792",
             appId: "1:502089598792:web:22daffdb858b91b50fd57d",
             measurementId: "G-XPDLWPXMJ9",
-            databaseURL: "https://pengukuranbaju-default-rtdb.firebaseio.com/" // Tambahkan ini
+            databaseURL: "https://pengukuranbaju-default-rtdb.firebaseio.com/"
         };
 
         // Inisialisasi Firebase
-        firebase.initializeApp(firebaseConfig);
+        try {
+            firebase.initializeApp(firebaseConfig);
+            console.log("Firebase berhasil diinisialisasi");
+        } catch (error) {
+            console.error("Gagal inisialisasi Firebase:", error);
+            alert("Ada masalah dengan koneksi Firebase. Cek konsol untuk detail.");
+        }
+
         const database = firebase.database();
 
         // Data siswa
@@ -184,21 +191,30 @@
             "B002": "Ahmad"
         };
 
-        // Data seragam yang disimpan (diambil dari Firebase saat load)
+        // Data seragam yang disimpan
         let uniformData = {};
 
         // Password admin
         const adminPassword = "admin123";
 
         // Ambil data dari Firebase saat halaman dimuat
-        database.ref("uniformData").on("value", (snapshot) => {
-            uniformData = snapshot.val() || {};
-            if (document.getElementById("adminData").classList.contains("hidden") === false) {
-                displayTable();
-            }
-        });
+        try {
+            database.ref("uniformData").on("value", (snapshot) => {
+                uniformData = snapshot.val() || {};
+                console.log("Data dari Firebase:", uniformData);
+                if (document.getElementById("adminData").classList.contains("hidden") === false) {
+                    displayTable();
+                }
+            }, (error) => {
+                console.error("Gagal mengambil data dari Firebase:", error);
+                alert("Gagal mengambil data dari Firebase.");
+            });
+        } catch (error) {
+            console.error("Error saat mengatur listener Firebase:", error);
+        }
 
         function checkStudent() {
+            console.log("Tombol Cek diklik");
             const id = document.getElementById("studentId").value.toUpperCase();
             const nameDisplay = document.getElementById("studentName");
             const uniformForm = document.getElementById("uniformForm");
@@ -213,6 +229,7 @@
         }
 
         function saveData() {
+            console.log("Tombol Simpan diklik");
             const id = document.getElementById("studentId").value.toUpperCase();
             const bajuPutih = document.getElementById("bajuPutih").value;
             const celanaBiru = document.getElementById("celanaBiru").value;
@@ -225,14 +242,21 @@
                 };
                 // Simpan ke Firebase
                 database.ref("uniformData").set(uniformData)
-                    .then(() => alert("Data berhasil disimpan!"))
-                    .catch((error) => alert("Gagal menyimpan: " + error));
+                    .then(() => {
+                        console.log("Data berhasil disimpan ke Firebase");
+                        alert("Data berhasil disimpan!");
+                    })
+                    .catch((error) => {
+                        console.error("Gagal menyimpan ke Firebase:", error);
+                        alert("Gagal menyimpan: " + error.message);
+                    });
             } else {
                 alert("Silakan pilih semua ukuran!");
             }
         }
 
         function toggleAdminPage() {
+            console.log("Tombol Admin diklik");
             const formPage = document.getElementById("formPage");
             const adminPage = document.getElementById("adminPage");
             formPage.classList.toggle("hidden");
@@ -240,6 +264,7 @@
         }
 
         function checkAdmin() {
+            console.log("Tombol Login Admin diklik");
             const password = document.getElementById("adminPassword").value;
             const adminData = document.getElementById("adminData");
             if (password === adminPassword) {
@@ -251,6 +276,7 @@
         }
 
         function displayTable() {
+            console.log("Menampilkan tabel");
             const tbody = document.getElementById("dataBody");
             tbody.innerHTML = "";
             for (const id in uniformData) {
@@ -266,6 +292,7 @@
         }
 
         function downloadCSV() {
+            console.log("Tombol Download CSV diklik");
             let csvContent = "ID,Nama,Baju Putih,Celana Biru\n";
             for (const id in uniformData) {
                 const row = [
