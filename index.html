@@ -139,6 +139,10 @@
             <button onclick="checkAdmin()">Login</button>
             <div id="adminData" class="hidden">
                 <h3>Data Seragam</h3>
+                <label for="uploadData">Upload Data (JSON):</label>
+                <input type="file" id="uploadData" accept=".json" onchange="uploadData(event)">
+                <button onclick="downloadJSON()" style="margin-top: 10px;">Download JSON</button>
+                <button onclick="downloadCSV()" style="margin-top: 10px;">Download CSV</button>
                 <table id="dataTable">
                     <thead>
                         <tr>
@@ -150,7 +154,6 @@
                     </thead>
                     <tbody id="dataBody"></tbody>
                 </table>
-                <button onclick="downloadCSV()" style="margin-top: 20px;">Download CSV</button>
             </div>
         </div>
     </div>
@@ -164,8 +167,8 @@
             "B002": "Ahmad"
         };
 
-        // Data seragam yang disimpan
-        let uniformData = {};
+        // Data seragam yang disimpan (diambil dari localStorage jika ada)
+        let uniformData = JSON.parse(localStorage.getItem("uniformData")) || {};
 
         // Password admin
         const adminPassword = "admin123";
@@ -195,6 +198,8 @@
                     bajuPutih: bajuPutih,
                     celanaBiru: celanaBiru
                 };
+                // Simpan ke localStorage
+                localStorage.setItem("uniformData", JSON.stringify(uniformData));
                 alert("Data berhasil disimpan!");
             } else {
                 alert("Silakan pilih semua ukuran!");
@@ -254,6 +259,36 @@
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
+        }
+
+        function downloadJSON() {
+            const jsonContent = JSON.stringify(uniformData, null, 2);
+            const blob = new Blob([jsonContent], { type: "application/json;charset=utf-8;" });
+            const link = document.createElement("a");
+            const url = URL.createObjectURL(blob);
+            link.setAttribute("href", url);
+            link.setAttribute("download", "data_seragam.json");
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        function uploadData(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    try {
+                        uniformData = JSON.parse(e.target.result);
+                        localStorage.setItem("uniformData", JSON.stringify(uniformData));
+                        displayTable();
+                        alert("Data berhasil diunggah!");
+                    } catch (error) {
+                        alert("File JSON tidak valid!");
+                    }
+                };
+                reader.readAsText(file);
+            }
         }
     </script>
 </body>
